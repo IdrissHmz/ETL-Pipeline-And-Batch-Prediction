@@ -17,6 +17,7 @@ FTP_RE = re.compile(r"^ftp://(?:{}@)?(?P<abs_path>.*)$".format(_CREDS_RE))
 
 FORCE_DISABLE_MULTIPROCESSING = False
 
+data_dir = "results/data"
 
 filter_regex = r"\.sdf"
 
@@ -48,3 +49,24 @@ ftp.quit()
 print(user, "\n", password, "\n", server, "\n", path_dir, "\n", uri_prefix, "\n")
 
 ftp_file_to_download = ftp_files[0]
+
+
+basename = os.path.basename(ftp_file_to_download.path)
+sdf_file = os.path.join(data_dir, os.path.splitext(basename)[0])
+
+if not tf.io.gfile.exists(sdf_file):
+
+    memfile = BytesIO()
+    ftp = ftplib.FTP(server, user, password)
+    ftp.retrbinary("RETR " + ftp_file_to_download.path, memfile.write)
+    ftp.quit()
+
+    memfile.seek(0)
+    with tf.io.gfile.GFile(sdf_file, "w") as f:
+        gzip_wbits_format = zlib.MAX_WBITS | 16
+        contents = zlib.decompress(memfile.getvalue(), gzip_wbits_format)
+        f.write(contents)
+    print("Extracted {}".format(sdf_file))
+
+else:
+    print("Found {}".format(sdf_file))
