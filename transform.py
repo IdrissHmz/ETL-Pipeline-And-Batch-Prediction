@@ -7,7 +7,6 @@ import os
 import random
 import tempfile
 
-import pubchem
 
 import apache_beam as beam
 import tensorflow as tf
