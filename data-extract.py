@@ -31,7 +31,7 @@ filter_re = re.compile(filter_regex)
 ftp_files = []
 
 m = FTP_RE.search(data_source[0])
-print(m)
+# print(m)
 if not m:
     raise ValueError("malformed FTP URI")
 user = m.group("user") or "anonymous"
