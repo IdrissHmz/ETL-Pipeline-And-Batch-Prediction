@@ -41,7 +41,7 @@ uri_prefix = "ftp://{}:{}@{}/".format(user, password, server)
 
 ftp = ftplib.FTP(server, user, password)
 ftp_files += [
-    {"user": user, "password": password, "server": server, "path": path,}
+    {"user": user, "password": password, "server": server, "path": path}
     for path in ftp.nlst(path_dir)
     if filter_re.search(uri_prefix + path)
 ]
@@ -49,16 +49,16 @@ ftp.quit()
 print(user, "\n", password, "\n", server, "\n", path_dir, "\n", uri_prefix, "\n")
 
 ftp_file_to_download = ftp_files[0]
+print(ftp_file_to_download)
 
-
-basename = os.path.basename(ftp_file_to_download.path)
+basename = os.path.basename(ftp_file_to_download["path"])
 sdf_file = os.path.join(data_dir, os.path.splitext(basename)[0])
 
 if not tf.io.gfile.exists(sdf_file):
 
     memfile = BytesIO()
     ftp = ftplib.FTP(server, user, password)
-    ftp.retrbinary("RETR " + ftp_file_to_download.path, memfile.write)
+    ftp.retrbinary("RETR " + ftp_file_to_download["path"], memfile.write)
     ftp.quit()
 
     memfile.seek(0)
