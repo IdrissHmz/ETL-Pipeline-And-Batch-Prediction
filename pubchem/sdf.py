@@ -8,7 +8,7 @@ MDF_SECTION = "MDF"
 SECTION_PREFIX = "<PUBCHEM_"
 
 
-def parse_molecules(raw_lines):
+def parseMolecules(raw_lines):
     """Generator that yields raw molecules."""
     molecule = None
     section = None
