@@ -46,3 +46,38 @@ class ParseSDF(beam.PTransform):
             | "Expand file patterns" >> beam.FlatMap(tf.io.gfile.glob)
             | "Parse molecules" >> beam.ParDo(parse_molecules)
         )
+
+
+# [START dataflow_molecules_simple_feature_extraction]
+class SimpleFeatureExtraction(beam.PTransform):
+    def __init__(self, source):
+        super(SimpleFeatureExtraction, self).__init__()
+        self.source = source
+
+    def expand(self, p):
+        # Return the preprocessing pipeline. In this case we're reading the PubChem
+        # files, but the source could be any Apache Beam source.
+        return (
+            p
+            | "Read raw molecules" >> self.source
+            | "Format molecule" >> beam.ParDo(FormatMolecule())
+            | "Count atoms" >> beam.ParDo(CountAtoms())
+        )
+
+
+# [END dataflow_molecules_simple_feature_extraction]
+
+
+# [START dataflow_molecules_normalize_inputs]
+def normalize_inputs(inputs):
+
+    return {
+        "NormalizedC": tft.scale_to_0_1(inputs["TotalC"]),
+        "NormalizedH": tft.scale_to_0_1(inputs["TotalH"]),
+        "NormalizedO": tft.scale_to_0_1(inputs["TotalO"]),
+        "NormalizedN": tft.scale_to_0_1(inputs["TotalN"]),
+        "Energy": inputs["Energy"],
+    }
+
+
+# [END dataflow_molecules_normalize_inputs]
